@@ -14,6 +14,7 @@ type CntProps = {
   inner_new: number;
   outer_opened: number;
   outer_new: number;
+  comment: string;
   logAt: string;
 };
 
@@ -25,14 +26,14 @@ const useStyles = makeStyles((theme: Theme) => ({
   gridRoot: {
       flexGrow: 1,
       paddingTop: theme.spacing(1),
-      paddingBottom: theme.spacing(3)
+      paddingBottom: theme.spacing(2)
   },
   birth: {
       paddingTop: theme.spacing(1)
   },
 }));
 
-function Cnt({ name, birth, inner_opened, inner_new, outer_opened, outer_new, logAt }: CntProps) {
+function Cnt({ name, birth, inner_opened, inner_new, outer_opened, outer_new, comment, logAt }: CntProps) {
   const classes = useStyles();
 
   return (
@@ -58,9 +59,15 @@ function Cnt({ name, birth, inner_opened, inner_new, outer_opened, outer_new, lo
                 <Grid item xs={8}>
                 개봉 {inner_opened}, 미개봉 {inner_new}
                 </Grid>
+                <Grid item xs={4}>
+                비고 사항
+                </Grid>
+                <Grid item xs={8}>
+                {comment}
+                </Grid>
             </Grid>
         </div>
-        <Typography  color="textSecondary">
+        <Typography variant="caption">
           입력시간 {logAt}
         </Typography>
       </CardContent>

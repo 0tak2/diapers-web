@@ -99,7 +99,7 @@ function Cnts() {
             {cntsDataCensored.map((cnt, index) => 
                 (<Cnt 
                     name={cnt.name} birth={cnt.birth} inner_opened={cnt.recentLog.inner_opened} inner_new={cnt.recentLog.inner_new}
-                    outer_opened={cnt.recentLog.outer_opened} outer_new={cnt.recentLog.outer_new} logAt={cnt.recentLog.time} key={index} />)
+                    outer_opened={cnt.recentLog.outer_opened} outer_new={cnt.recentLog.outer_new} comment={cnt.recentLog.comment} logAt={cnt.recentLog.time} key={index} />)
             )}
         </>
        

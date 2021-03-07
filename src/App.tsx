@@ -2,6 +2,7 @@ import React from 'react';
 import { Route } from 'react-router-dom';
 import About from './pages/About';
 import Main from './pages/Main';
+import Log from './pages/Log';
 import Login from './pages/Login';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
@@ -24,6 +25,7 @@ function App() {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Route path="/" exact component={Main} />
+        <Route path="/log" component={Log} />
         <Route path="/about" component={About} />
         <Route path="/login" component={Login} />
       </ThemeProvider>

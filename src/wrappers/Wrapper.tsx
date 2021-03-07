@@ -7,7 +7,6 @@ import Button from '@material-ui/core/Button';
 import Drawer from '@material-ui/core/Drawer';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
-
 import Footer from '../components/Footer';
 import DrawerContents from '../components/DrawerContents';
 
