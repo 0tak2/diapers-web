@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
@@ -9,6 +9,10 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '../modules';
+import { login, logout } from '../modules/auth';
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
@@ -33,6 +37,33 @@ const useStyles = makeStyles((theme: Theme) => ({
 export default function Login() {
   const classes = useStyles();
 
+  // A local state
+  const initialState = {
+    username: "",
+    password: ""
+  }
+
+  const [state, setState] = useState(initialState);
+
+  const onChange = (e: any) => {
+    setState({
+      ...state,
+      [e.target.name]: e.target.value
+    });
+  }
+
+  // redux store
+  const isLogin = useSelector((state: RootState) => state.auth.isLogin);
+  const isLoading = useSelector((state: RootState) => state.auth.isLoading);
+  const dispatch = useDispatch();
+
+  const onClick = () => {
+    dispatch(login(state));
+  }
+  const onClick2 = () => {
+    dispatch(logout());
+  }
+
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -52,6 +83,7 @@ export default function Login() {
             name="username"
             autoComplete="username"
             autoFocus
+            onChange={onChange}
           />
           <TextField
             variant="outlined"
@@ -63,19 +95,29 @@ export default function Login() {
             type="password"
             id="password"
             autoComplete="current-password"
+            onChange={onChange}
           />
           <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}
             label="자동 로그인"
           />
           <Button
-            type="submit"
             fullWidth
             variant="contained"
             color="primary"
             className={classes.submit}
+            onClick={onClick}
           >
             로그인
+          </Button>
+          <Button
+            fullWidth
+            variant="contained"
+            color="primary"
+            className={classes.submit}
+            onClick={onClick2}
+          >
+            로그아웃
           </Button>
           <Grid container>
             <Grid item>
@@ -85,6 +127,12 @@ export default function Login() {
             </Grid>
           </Grid>
         </form>
+        <div>
+          [DEBUG INFO]<br />
+          username: {state.username}<br />
+          password: {state.password}<br />
+        </div>
+        {isLoading ? <div>loading</div> : null}
       </div>
     </Container>
   );
