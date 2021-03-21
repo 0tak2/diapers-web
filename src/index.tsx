@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter } from 'react-router-dom';
+import { Router } from 'react-router-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
@@ -9,9 +9,16 @@ import { createStore, applyMiddleware } from 'redux';
 import rootReducer, { rootSaga }  from './modules';
 import logger from 'redux-logger';
 import { composeWithDevTools } from 'redux-devtools-extension';
+import { createBrowserHistory } from 'history';
 import createSagaMiddleware from 'redux-saga';
 
-const sagaMiddleware = createSagaMiddleware();
+const customHistory = createBrowserHistory();
+
+const sagaMiddleware = createSagaMiddleware({
+  context: {
+    history: customHistory
+  }
+});
 
 const store = createStore(
   rootReducer,
@@ -28,9 +35,9 @@ sagaMiddleware.run(rootSaga)
 ReactDOM.render(
    <Provider store={store}>
     <React.StrictMode>
-      <BrowserRouter>
+      <Router history={customHistory}>
         <App />
-      </BrowserRouter>
+      </Router>
     </React.StrictMode>
    </Provider>,
   document.getElementById('root')

@@ -1,10 +1,11 @@
 import React from 'react';
-import { withRouter } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
-import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
+
+import LoginPanelContainer from '../containers/LoginPanelContainer';
 
 const useStyles = makeStyles({
     list: {
@@ -26,7 +27,7 @@ const links = [
         to: "/summary"
     },
     {
-        label: "보고서 작성",
+        label: "보고서",
         to: "/report"
     },
     {
@@ -39,18 +40,8 @@ const links = [
     },
 ]
 
-// withRouter가 타입스크립트에서 지원이 되지 않아,
-// withRouter로 감싸면 자동으로 history가 넘어오게 되는데도 오류가 발생하는 문제가 있다.
-// 따라서 어쩔 수 없이 임시방편으로 props를 any로 지정했다.
-/*
-type DrawerContentsProps = {
-    toggleDrawer: () => void;
-    history: History
-}
-*/
-
 function DrawerContents(props: any) {
-    const { toggleDrawer, history } = props;
+    const { toggleDrawer } = props;
 
     const classes = useStyles();
 
@@ -60,13 +51,12 @@ function DrawerContents(props: any) {
             role="presentation"
             onClick={toggleDrawer}
             >
-            여기에 로그인 관련 컴포넌트가 위치합니다.
-            <Divider />
+            <LoginPanelContainer />
             <List>
                 {
                     links.map((link, index) => (
-                        <ListItem button key={index}>
-                            <ListItemText primary={link.label} onClick={() => history.push(link.to)} />
+                        <ListItem button key={index} component={Link} to={link.to}>
+                            <ListItemText primary={link.label}  />
                         </ListItem>
                     ))
                 }
@@ -75,4 +65,4 @@ function DrawerContents(props: any) {
     );
 }
 
-export default withRouter(DrawerContents);
+export default DrawerContents;

@@ -1,87 +1,126 @@
-import axios from 'axios';
-import { call, put, takeEvery } from 'redux-saga/effects';
+import { call, put, takeEvery, getContext } from 'redux-saga/effects';
+import { loginApi, logoutApi, LoginPayload, LoginResponse, LogoutResponse, UserData, getUserdataApi } from '../api/auth';
+import { History } from 'history';
 
-const LOGIN = 'auth/LOGIN' as const;
+const LOGIN_REQUEST = 'auth/LOGIN_REQUEST' as const;
 const LOGIN_SUCCESS = 'auth/LOGIN_SUCCESS' as const;
 const LOGIN_FAILED = 'auth/LOGIN_FAILED' as const;
 
-const LOGOUT = 'auth/LOGOUT' as const;
+const LOGOUT_REQUEST = 'auth/LOGOUT_REQUEST' as const;
 const LOGOUT_SUCCESS = 'auth/LOGOUT_SUCCESS' as const;
 const LOGOUT_FAILED = 'auth/LOGOUT_FAILED' as const;
 
-type LoginPayload = {
-    username: string;
-    password: string;
-}
+const REDIRECT_HOME = 'auth/REDIRECT_HOME' as const;
 
-export const login = (payload: LoginPayload) => ({ type: LOGIN, payload });
-export const loginSuccess = (payload: string) => ({ type: LOGIN_SUCCESS , payload });
-export const loginFailed = (payload: string) => ({ type: LOGIN_FAILED, payload });
-export const logout = () => ({ type: LOGOUT });
-export const logoutSuccess = (payload: string) => ({ type: LOGOUT_SUCCESS , payload });
-export const logoutFailed = (payload: string) => ({ type: LOGOUT_FAILED, payload });
+const GET_USERDATA_BY_COOKIE_REQUEST = 'auth/GET_USERDATA_BY_COOKIE_REQUEST' as const;
+const GET_USERDATA_BY_COOKIE_SUCCESS = 'auth/GET_USERDATA_BY_COOKIE_SUCCESS' as const;
+const GET_USERDATA_BY_COOKIE_FAILED = 'auth/GET_USERDATA_BY_COOKIE_FAILED' as const;
+
+export const loginRequest = (payload: LoginPayload) => ({ type: LOGIN_REQUEST, payload });
+export const loginSuccess = (payload: LoginResponse) => ({ type: LOGIN_SUCCESS , payload });
+export const loginFailed = (payload: any) => ({ type: LOGIN_FAILED, payload });
+export const logoutRequest = () => ({ type: LOGOUT_REQUEST });
+export const logoutSuccess = (payload: LogoutResponse) => ({ type: LOGOUT_SUCCESS , payload });
+export const logoutFailed = (payload: any) => ({ type: LOGOUT_FAILED, payload });
+export const redirectHome = () => ({ type: REDIRECT_HOME });
+export const getUserdataRequest = () => ({ type: GET_USERDATA_BY_COOKIE_REQUEST });
+export const getUserdataSuccess = (payload: LoginResponse) => ({ type: GET_USERDATA_BY_COOKIE_SUCCESS, payload });
+export const getUserdataFailed = (payload: any) => ({ type: GET_USERDATA_BY_COOKIE_FAILED, payload });
 
 type AuthAction =
-    | ReturnType<typeof login>
+    | ReturnType<typeof loginRequest>
     | ReturnType<typeof loginSuccess>
     | ReturnType<typeof loginFailed>
-    | ReturnType<typeof logout>
+    | ReturnType<typeof logoutRequest>
     | ReturnType<typeof logoutSuccess>
-    | ReturnType<typeof logoutFailed>;
+    | ReturnType<typeof logoutFailed>
+    | ReturnType<typeof redirectHome>
+    | ReturnType<typeof getUserdataRequest>
+    | ReturnType<typeof getUserdataSuccess>
+    | ReturnType<typeof getUserdataFailed>;
 
-function* loginSaga(action: ReturnType<typeof login>) {
+function* loginSaga(action: ReturnType<typeof loginRequest>) {
     try {
-        const response: string = yield call(axios.post, "/api/auth/loginc", action.payload, { withCredentials: true })
-        yield put(loginSuccess(response))
+        const response: LoginResponse = yield call(loginApi, action.payload);
+        yield put(loginSuccess(response));
     } catch (e) {
-        yield put(loginFailed(e))
+        yield put(loginFailed(e.response.data));
     }
 }
 
 function* logoutSaga() {
     try {
-        const response: string = yield call(axios.post, "/api/auth/logoutc", "", { withCredentials: true })
-        yield put(loginSuccess(response))
+        const response: LogoutResponse = yield call(logoutApi);
+        yield put(logoutSuccess(response));
     } catch (e) {
-        yield put(loginFailed(e))
+        yield put(logoutFailed(e.response.data));
+    }
+}
+
+function* loginSuccessSaga() {
+    yield put(redirectHome());
+}
+
+function* logoutSuccessSaga() {
+   yield put(redirectHome());
+}
+
+function* redirectHomeSaga() {
+    const history: History = yield getContext('history');
+    history.push('/');
+}
+
+function* getUserdataSaga() {
+    try {
+        const response: LoginResponse = yield call(getUserdataApi);
+        yield put(getUserdataSuccess(response));
+    } catch (e) {
+        yield put(getUserdataFailed(e));
     }
 }
 
 export function* authSaga() {
-    yield takeEvery(LOGIN, loginSaga);
-    yield takeEvery(LOGOUT, logoutSaga);
+    yield takeEvery(LOGIN_REQUEST, loginSaga);
+    yield takeEvery(LOGOUT_REQUEST, logoutSaga);
+    yield takeEvery(LOGIN_SUCCESS, loginSuccessSaga);
+    yield takeEvery(LOGOUT_SUCCESS, logoutSuccessSaga);
+    yield takeEvery(REDIRECT_HOME, redirectHomeSaga);
+    yield takeEvery(GET_USERDATA_BY_COOKIE_REQUEST, getUserdataSaga);
 }
 
 type AuthState = {
     username: string;
-    isLoading: boolean;
+    userdata: UserData | null;
+    loading: boolean;
     isLogin: boolean;
-    isError: boolean;
-    message: string;
+    error: any | null;
 };
 
 const initialState: AuthState = {
     username: "",
-    isLoading: false,
+    userdata: null,
+    loading: false,
     isLogin: false,
-    isError: false,
-    message: ""
+    error: null
 };
 
 function auth( state: AuthState = initialState, action: AuthAction ): AuthState {
     switch (action.type) {
-        case LOGIN:
-            return { ...state, isLoading: true };
+        case LOGIN_REQUEST:
+        case GET_USERDATA_BY_COOKIE_REQUEST:
+            return { ...state, loading: true };
         case LOGIN_SUCCESS:
-            return {...state, isLoading: false, username: action.payload, message: action.payload};
+        case GET_USERDATA_BY_COOKIE_SUCCESS:
+            return {...state, loading: false, isLogin: true, username: action.payload.username, userdata: action.payload.user_data , error: null};
         case LOGIN_FAILED:
-            return {...state, isLoading: false, isError: true, message: action.payload};
-        case LOGOUT:
-            return { ...state, isLoading: true };
-        case LOGIN_SUCCESS:
-            return {...state, isLoading: false, username: "", message: action.payload};
-        case LOGIN_FAILED:
-            return {...state, isLoading: false, isError: true, message: action.payload};
+        case GET_USERDATA_BY_COOKIE_FAILED:
+            return {...state, loading: false, error: action.payload};
+        case LOGOUT_REQUEST:
+            return { ...state, loading: true };
+        case LOGOUT_SUCCESS:
+            return {...state, loading: false, isLogin: false,  username: "", userdata: null, error: null};
+        case LOGOUT_FAILED:
+            return {...state, loading: false, error: action.payload};
         default:
             return state;
     }
