@@ -51,10 +51,10 @@ function LogsSheet({ bunch }: LogsSheetProps) {
                 {bunch.logs.map((log: LogType) => (
                     <TableRow key={log.id}>
                         <TableCell>{dateHelper(log.time, true)}</TableCell>
-                        <TableCell>{log.inner_opened}</TableCell>
-                        <TableCell>{log.inner_new}</TableCell>
                         <TableCell>{log.outer_opened}</TableCell>
                         <TableCell>{log.outer_new}</TableCell>
+                        <TableCell>{log.inner_opened}</TableCell>
+                        <TableCell>{log.inner_new}</TableCell>
                         <TableCell>{log.comment}</TableCell>
                         <TableCell>{log.created_by}</TableCell>
                         <TableCell>{log.modified_by}</TableCell>

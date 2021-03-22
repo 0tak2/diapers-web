@@ -3,12 +3,14 @@ import React, { useEffect }  from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../modules';
-import { getLogsRequest } from '../modules/logs';
+import { getLogsRequest, postLogRequest } from '../modules/logs';
+import { PostLogPayload } from '../api/logs';
 
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 
 import LogsSheet from '../components/LogsSheet';
+import LogControl from '../components/LogControl';
 
 interface MatchParams {
     cntId: string;
@@ -38,6 +40,8 @@ function LogsContainer({ match }: RouteComponentProps<MatchParams>) {
 
     // redux store
     const loading = useSelector((state: RootState) => state.logs.loading);
+    const error = useSelector((state: RootState) => state.logs.error);
+    const changed = useSelector((state: RootState) => state.logs.changed);
     const logsBunches = useSelector((state: RootState) => state.logs.logsBunches);
     const dispatch = useDispatch();
 
@@ -61,9 +65,17 @@ function LogsContainer({ match }: RouteComponentProps<MatchParams>) {
         dispatch(getLogsRequest({ cntId, page: 0, size: 10 }));
     }, [cntId])
 
+    useEffect(() => {
+        if (changed) dispatch(getLogsRequest({ cntId, page: 0, size: 10 }));
+    }, [changed])
+
+    const onSubmit = (payload: PostLogPayload) => {
+        dispatch(postLogRequest(payload));
+    }
+
     return (
         <>
-            {logsBunches ? <LogsSheet bunch={matchedLogsBunch(cntId)}></LogsSheet> : ""}
+            {logsBunches ? <><LogControl bunch={matchedLogsBunch(cntId)} onSubmit={onSubmit} error={error}/><LogsSheet bunch={matchedLogsBunch(cntId)}></LogsSheet></> : ""}
             {loading ? <div className={classes.backdrop}><CircularProgress /></div> : ""}
         </>
        

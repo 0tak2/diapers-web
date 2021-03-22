@@ -149,6 +149,7 @@ type LogsState = {
     log: LogType | null;
     loading: boolean;
     error: any | null;
+    changed: boolean;
 };
 
 const initialState: LogsState = {
@@ -157,7 +158,8 @@ const initialState: LogsState = {
     // 단일 데이터를 가져왔을 경우
     log: null,
     loading: false,
-    error: null
+    error: null,
+    changed: false
 };
 
 
@@ -175,7 +177,7 @@ function logs( state: LogsState = initialState, action: LogsAction ): LogsState 
             const { result, last, page, size } =  action.payload;
             const cntId = result[0].cnt;
             return {
-                ...state, loading: false, error: null,
+                ...state, loading: false, error: null, changed: false,
                 logsBunches: [
                     ...state.logsBunches,
                     { logs: result, cntId,  last, page, size }
@@ -187,7 +189,7 @@ function logs( state: LogsState = initialState, action: LogsAction ): LogsState 
         case POST_LOG_SUCCESS:
         case DEL_LOG_SUCCESS:
         case PATCH_LOG_SUCCESS:
-            return { ...state, loading: false, log: null };
+            return { ...state, loading: false, log: null, changed: true };
         case GET_LOGS_FAILED:
         case GET_LOGS_FOR_A_PERIOD_FAILED:
         case GET_LOG_FAILED:

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getCookie } from '../utils/cookieUtil';
 
 const baseUri = '/api/logs'
 
@@ -111,7 +112,12 @@ export async function postLogApi(payload: PostLogPayload) {
     const response = await axios.post<BaseLogResponse>(
         baseUri,
         payload,
-        { withCredentials: true });
+        {
+            withCredentials: true,
+            headers: {
+                'X-CSRF-TOKEN': getCookie('csrf_access_token'),
+            },
+        });
     return response.data;
 }
 

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getCookie } from '../utils/cookieUtil';
 
 const baseUri = '/api/cnts'
 
@@ -92,7 +93,12 @@ export async function postCntApi(payload: PostCntPayload) {
     const response = await axios.post<BaseCntResponse>(
         baseUri,
         payload,
-        { withCredentials: true });
+        {
+            withCredentials: true,
+            headers: {
+                'X-CSRF-TOKEN': getCookie('csrf_access_token'),
+            },
+        });
     return response.data;
 }
 

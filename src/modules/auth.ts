@@ -67,7 +67,7 @@ function* logoutSuccessSaga() {
 
 function* redirectHomeSaga() {
     const history: History = yield getContext('history');
-    history.push('/');
+    history.goBack();
 }
 
 function* getUserdataSaga() {

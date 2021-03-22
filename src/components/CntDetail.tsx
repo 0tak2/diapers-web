@@ -52,10 +52,10 @@ function CntDetail({ cntId, name, birth, description, inner_product, outer_produ
             이용자 설명: {description}
         </Typography>
         <Typography variant="body2">
-            기본 속 기저귀: {inner_product}
+            기본 겉 기저귀: {outer_product}
         </Typography>
         <Typography variant="body2">
-            기본 겉 기저귀: {outer_product}
+            기본 속 기저귀: {inner_product}
         </Typography>
         {deactivated ? <Typography variant="body2">
             비활성화된 이용자
