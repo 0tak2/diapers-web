@@ -11,8 +11,15 @@ export const delAccountInfo = () => {
 }
 
 export const getAccountInfo = () => {
-    return {
-        username: localStorage.username,
-        userdata: JSON.parse(localStorage.userdata)
+    if (localStorage.username !== undefined && localStorage !== undefined) {
+        return {
+            username: localStorage.username,
+            userdata: JSON.parse(localStorage.userdata)
+        }
+    } else {
+        return {
+            username: null,
+            userdata: null
+        }
     }
 }
