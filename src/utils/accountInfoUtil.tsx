@@ -18,8 +18,8 @@ export const getAccountInfo = () => {
         }
     } else {
         return {
-            username: null,
-            userdata: null
+            username: 'null',
+            userdata: 'null'
         }
     }
 }
