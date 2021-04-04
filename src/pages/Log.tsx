@@ -8,6 +8,7 @@ import { makeStyles, Theme } from '@material-ui/core/styles';
 import CntButtonsContainer from '../containers/CntButtonsContainer';
 import LogsContainer from '../containers/LogsContainer';
 import CntDetailContainer from '../containers/CntDetailContainer';
+import LogDetailContainer from '../containers/LogDetailContainer';
 
 const useStyles = makeStyles((theme: Theme) => ({
     title: {
@@ -26,7 +27,7 @@ function Log() {
                     <div className={classes.title}>
                         <Typography variant="h3" component="h1">재고 현황</Typography>
                     </div>
-                    <CntButtonsContainer />
+                    <CntButtonsContainer baseUri={"/log"}/>
                     <Route
                         path="/log"
                         exact
@@ -39,6 +40,10 @@ function Log() {
                    <Route
                         path="/log/:cntId"
                         component={LogsContainer}
+                    />
+                    <Route
+                        path="/log/:cntId/:logId"
+                        component={LogDetailContainer}
                     />
                 </Container>
             </LoginCheck>

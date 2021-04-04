@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Button from '@material-ui/core/Button';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 
 import { Link as RouterLink } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 
+import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../modules';
+import { getUserdataRequest } from '../modules/auth';
+
+import { getAccountInfo } from '../utils/accountInfoUtil';
 
 type LoginCheckProps = {
   children: React.ReactNode;
@@ -33,6 +36,15 @@ export default function LoginCheck({ children }: LoginCheckProps) {
 
   // redux store
   const isLogin = useSelector((state: RootState) => state.auth.isLogin);
+  const dispatch = useDispatch();
+
+  // useEffect
+  useEffect(() => {
+    if (!isLogin) {
+        const { username, userdata } = getAccountInfo();
+        if (username !== 'null' && userdata !== 'null') dispatch(getUserdataRequest());
+    }
+}, [])
 
   return (
     <>

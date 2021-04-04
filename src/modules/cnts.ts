@@ -90,7 +90,7 @@ function* getCntsAllSaga() {
         const response: GetCntsAllResponse = yield call(getCntsAllApi);
         yield put(getCntsAllSuccess(response));
     } catch (e) {
-        yield put(getCntsAllFailed(e.response.data));
+        yield put(getCntsAllFailed(e));
     }
 }
 
@@ -99,7 +99,7 @@ function* getCntsPageSaga(action: ReturnType<typeof getCntsPageRequest>) {
         const response: GetCntsPageResponse = yield call(getCntsPageApi, action.payload);
         yield put(getCntsPageSuccess(response));
     } catch (e) {
-        yield put(getCntsPageFailed(e.response.data));
+        yield put(getCntsPageFailed(e));
     }
 }
 
@@ -108,7 +108,7 @@ function* getCntsPageAndRecentLogSaga(action: ReturnType<typeof getCntsPageReque
         const response: GetCntsPageResponse = yield call(getCntsPageApi, action.payload);
         yield put(getCntsPageAndRecentLogSuccess(response));
     } catch (e) {
-        yield put(getCntsPageAndRecentLogFailed(e.response.data));
+        yield put(getCntsPageAndRecentLogFailed(e));
     }
 }
 
@@ -121,7 +121,7 @@ function* getCntSaga(action: ReturnType<typeof getCntRequest>) { //get
         const response: GetCntResponse = yield call(getCntApi, action.payload);
         yield put(getCntSuccess(response));
     } catch (e) {
-        yield put(getCntFailed(e.response.data));
+        yield put(getCntFailed(e));
     }
 }
 
@@ -130,7 +130,7 @@ function* postCntSaga(action: ReturnType<typeof postCntRequest>) { //post
         const response: BaseCntResponse = yield call(postCntApi, action.payload);
         yield put(postCntSuccess(response));
     } catch (e) {
-        yield put(postCntFailed(e.response.data));
+        yield put(postCntFailed(e));
     }
 }
 
@@ -139,7 +139,7 @@ function* delCntSaga(action: ReturnType<typeof delCntRequest>) { //del
         const response: BaseCntResponse = yield call(delCntApi, action.payload);
         yield put(delCntSuccess(response));
     } catch (e) {
-        yield put(delCntFailed(e.response.data));
+        yield put(delCntFailed(e));
     }
 }
 
@@ -148,7 +148,7 @@ function* patchCntSaga(action: ReturnType<typeof patchCntRequest>) { //patch
         const response: BaseCntResponse = yield call(patchCntApi, action.payload);
         yield put(patchCntSuccess(response));
     } catch (e) {
-        yield put(patchCntFailed(e.response.data));
+        yield put(patchCntFailed(e));
     }
 }
 

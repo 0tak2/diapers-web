@@ -43,6 +43,12 @@ export interface GetLogsForPeriodPayload {
     end: string;
 }
 
+export interface GetAllLogsForPeriodPayload {
+    cntId: string;
+    start: string;
+    end: string;
+}
+
 export interface GetLogsResponse {
     success: boolean;
     result:  LogType[];
@@ -100,6 +106,19 @@ export async function getLogsForPeriodApi(payload: GetLogsForPeriodPayload) {
     return response.data;
 }
 
+export async function getAllLogsForPeriodApi(payload: GetAllLogsForPeriodPayload) {
+    const response = await axios.get<GetLogsResponse>(
+        baseUri + `/cnt/${payload.cntId}`,
+        {
+            withCredentials: true,
+            params: {
+                start: payload.start,
+                end:  payload.end
+            }
+        });
+    return response.data;
+}
+
 export async function getLogApi(payload: BaseLogPayload) {
     const response = await axios.get<GetLogResponse>(
         baseUri + `/${payload.logId}`,
@@ -124,7 +143,12 @@ export async function postLogApi(payload: PostLogPayload) {
 export async function delLogApi(payload: BaseLogPayload) {
     const response = await axios.delete<BaseLogResponse>(
         baseUri + `/${payload.logId}`,
-        { withCredentials: true });
+        {
+            withCredentials: true,
+            headers: {
+                'X-CSRF-TOKEN': getCookie('csrf_access_token'),
+            },
+        });
     return response.data;
 }
 
@@ -133,6 +157,11 @@ export async function patchLogApi(payload: PatchLogPayload) {
     const response = await axios.patch<BaseLogResponse>(
         baseUri + `/${logId}`,
         payloadWithoutId,
-        { withCredentials: true });
+        {
+            withCredentials: true,
+            headers: {
+                'X-CSRF-TOKEN': getCookie('csrf_access_token'),
+            },
+        });
     return response.data;
 }

@@ -111,7 +111,8 @@ export default function LoginForm() {
         </Button>
         <Grid container>
           <Grid item>
-            * 계정 등록, 계정 찾기 등은 관리자에게 문의하십시오.
+            * 계정 등록, 계정 찾기 등은 관리자에게 문의하십시오. <br />
+            * 시스템을 30분 이상 사용하지 않은 경우 로그인에 오랜 시간이 소요될 수 있습니다.
           </Grid>
         </Grid>
       </form>

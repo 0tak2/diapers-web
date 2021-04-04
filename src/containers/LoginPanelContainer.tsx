@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 
 import { useSelector, useDispatch } from 'react-redux';
@@ -12,7 +12,6 @@ import LoginPanel from '../components/LoginPanel';
 
 function LoginPanelContainer() {
     const onClickLogout = () => {
-        localStorage.setItem('remember', false.toString())
         dispatch(logoutRequest());
     }
 

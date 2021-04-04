@@ -1,6 +1,7 @@
 import { call, put, takeEvery, getContext } from 'redux-saga/effects';
 import { loginApi, logoutApi, LoginPayload, LoginResponse, LogoutResponse, UserData, getUserdataApi } from '../api/auth';
 import { History } from 'history';
+import { saveAccountInfo, delAccountInfo, getAccountInfo } from '../utils/accountInfoUtil';
 
 const LOGIN_REQUEST = 'auth/LOGIN_REQUEST' as const;
 const LOGIN_SUCCESS = 'auth/LOGIN_SUCCESS' as const;
@@ -44,7 +45,7 @@ function* loginSaga(action: ReturnType<typeof loginRequest>) {
         const response: LoginResponse = yield call(loginApi, action.payload);
         yield put(loginSuccess(response));
     } catch (e) {
-        yield put(loginFailed(e.response.data));
+        yield put(loginFailed(e));
     }
 }
 
@@ -53,7 +54,7 @@ function* logoutSaga() {
         const response: LogoutResponse = yield call(logoutApi);
         yield put(logoutSuccess(response));
     } catch (e) {
-        yield put(logoutFailed(e.response.data));
+        yield put(logoutFailed(e));
     }
 }
 
@@ -110,14 +111,26 @@ function auth( state: AuthState = initialState, action: AuthAction ): AuthState 
         case GET_USERDATA_BY_COOKIE_REQUEST:
             return { ...state, loading: true };
         case LOGIN_SUCCESS:
-        case GET_USERDATA_BY_COOKIE_SUCCESS:
+            saveAccountInfo(action.payload.username, action.payload.user_data);
             return {...state, loading: false, isLogin: true, username: action.payload.username, userdata: action.payload.user_data , error: null};
+        case GET_USERDATA_BY_COOKIE_SUCCESS:
+            const { username, user_data } = action.payload;
+            const savedAccountInfo = getAccountInfo();
+            if (username === savedAccountInfo.username) {
+                if (user_data.description === savedAccountInfo.userdata.description
+                    && user_data.realname === savedAccountInfo.userdata.realname
+                    && user_data.level === savedAccountInfo.userdata.level) {
+                        return {...state, loading: false, isLogin: true, username: username, userdata: user_data , error: null};
+                    }
+            }
+            return {...state, loading: false, isLogin: false, error: null};
         case LOGIN_FAILED:
         case GET_USERDATA_BY_COOKIE_FAILED:
             return {...state, loading: false, error: action.payload};
         case LOGOUT_REQUEST:
             return { ...state, loading: true };
         case LOGOUT_SUCCESS:
+            delAccountInfo();
             return {...state, loading: false, isLogin: false,  username: "", userdata: null, error: null};
         case LOGOUT_FAILED:
             return {...state, loading: false, error: action.payload};

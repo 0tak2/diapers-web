@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -7,6 +8,10 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import IconButton  from '@material-ui/core/IconButton';
+import EditIcon from '@material-ui/icons/Edit';
+
+import SheetPagination from './SheetPagination';
 
 import { LogType } from '../api/logs';
 import { dateHelper } from '../utils/dateUtil';
@@ -21,6 +26,10 @@ interface LogsBunch {
 
 interface LogsSheetProps {
     bunch: LogsBunch;
+    page: number;
+    logsPerPage: number;
+    onChangeRequestPage: (newPage: number) => void;
+    onChangeLogsPerPage: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 }
 
 const useStyles = makeStyles({
@@ -29,10 +38,11 @@ const useStyles = makeStyles({
     },
   });
 
-function LogsSheet({ bunch }: LogsSheetProps) {
+function LogsSheet({ bunch, page, logsPerPage, onChangeRequestPage, onChangeLogsPerPage }: LogsSheetProps) {
     const classes = useStyles();
 
     return (
+        <>
         <TableContainer component={Paper}>
             <Table className={classes.table} aria-label="기저귀 재고 데이터 시트">
                 <TableHead>
@@ -45,6 +55,7 @@ function LogsSheet({ bunch }: LogsSheetProps) {
                         <TableCell>비고</TableCell>
                         <TableCell>작성자</TableCell>
                         <TableCell>수정자</TableCell>
+                        <TableCell></TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -58,12 +69,24 @@ function LogsSheet({ bunch }: LogsSheetProps) {
                         <TableCell>{log.comment}</TableCell>
                         <TableCell>{log.created_by}</TableCell>
                         <TableCell>{log.modified_by}</TableCell>
+                        <TableCell>
+                            <IconButton aria-label="edit or delete" size="small" component={RouterLink} to={`/log/${log.cnt}/${log.id}`}>
+                                <EditIcon />
+                            </IconButton>
+                        </TableCell>
                     </TableRow>
                 ))}
                 </TableBody>
             </Table>
         </TableContainer>
-        // 추가 로드 버튼 구현
+        <SheetPagination
+            rowsPerPageOptions={[10, 15, 20]}
+            rowsPerPage={logsPerPage}
+            page={page}
+            isLast={bunch.last}
+            onChangePage={onChangeRequestPage}
+            onChangeRowsPerPage={onChangeLogsPerPage} />
+        </>
     );
 }
 

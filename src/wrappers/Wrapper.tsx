@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 function MainContainer({ children }: MainContainerProps) {
-    const [showMenu, setShowMenu] = useState(false);
+    const [showMenu, setShowMenu] = useState(false); 
 
     const toggleDrawer = () => {
         setShowMenu(!showMenu);

@@ -12,6 +12,10 @@ import { censorCntName } from '../utils/censorUtil';
 
 const sizePerPage = 4;
 
+interface CntButtonsContainerProps {
+    baseUri: string;
+}
+
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
@@ -23,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function CntCardsContainer() {
+function CntButtonsContainer({ baseUri }: CntButtonsContainerProps) {
     const classes = useStyles();
 
     // redux store
@@ -53,15 +57,15 @@ function CntCardsContainer() {
                 {
                     loading ?
                     <ButtonGroup color="primary" aria-label="outlined primary button group" disabled>
-                        {page && page > 0 ? <Button onClick={onClickPrev}>&lt;</Button> : ""}
+                        {page && page > 0 ? <Button>&lt;</Button> : ""}
                         {cnts ? cnts.map((cnt, index) => 
-                        (<Button key={index} component={RouterLink} to={`/log/${cnt.id}`}>{censorCntName(cnt.name)}</Button>)) : ""}
-                        {!last ? <Button onClick={onClickNext}>&gt;</Button> : ""}
+                        (<Button key={index}>{censorCntName(cnt.name)}</Button>)) : ""}
+                        {!last ? <Button>&gt;</Button> : ""}
                     </ButtonGroup> :
                     <ButtonGroup color="primary" aria-label="outlined primary button group">
                         {page && page > 0 ? <Button onClick={onClickPrev}>&lt;</Button> : ""}
                         {cnts ? cnts.map((cnt, index) => 
-                        (<Button key={index} component={RouterLink} to={`/log/${cnt.id}`}>{censorCntName(cnt.name)}</Button>)) : ""}
+                        (<Button key={index} component={RouterLink} to={`${baseUri}/${cnt.id}`}>{censorCntName(cnt.name)}</Button>)) : ""}
                         {!last ? <Button onClick={onClickNext}>&gt;</Button> : ""}
                     </ButtonGroup>
                 }
@@ -72,4 +76,4 @@ function CntCardsContainer() {
     )
 }
 
-export default CntCardsContainer;
+export default CntButtonsContainer;
