@@ -36,7 +36,7 @@ function About() {
                     <Typography variant="h3" component="h1">서비스 소개</Typography>
                 </div>
                 <div>
-                    <img src="./diapers-logo.png" alt="A logo of the service."></img>
+                    <img src="/static/diapers-logo.png" alt="A logo of the service."></img>
                     <P>
                         다이퍼스 DIAPERS는 소규모 사회복지시설에서의 효율적인 기저귀 재고 관리를 위한 솔루션입니다.
                     </P>

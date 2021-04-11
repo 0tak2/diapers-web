@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import Button from '@material-ui/core/Button';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, withRouter, RouteComponentProps } from 'react-router-dom';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../modules';
@@ -10,8 +10,11 @@ import { getUserdataRequest } from '../modules/auth';
 
 import { getAccountInfo } from '../utils/accountInfoUtil';
 
-type LoginCheckProps = {
+interface LoginCheckProps {
   children: React.ReactNode;
+}
+
+interface params extends LoginCheckProps, RouteComponentProps {
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -31,11 +34,12 @@ const useStyles = makeStyles((theme: Theme) => ({
   }
 }));
 
-export default function LoginCheck({ children }: LoginCheckProps) {
+function LoginCheck({ children, history }: params) {
   const classes = useStyles();
 
   // redux store
   const isLogin = useSelector((state: RootState) => state.auth.isLogin);
+  const error = useSelector((state: RootState) => state.auth.error);
   const dispatch = useDispatch();
 
   // useEffect
@@ -44,7 +48,13 @@ export default function LoginCheck({ children }: LoginCheckProps) {
         const { username, userdata } = getAccountInfo();
         if (username !== 'null' && userdata !== 'null') dispatch(getUserdataRequest());
     }
-}, [])
+}, []);
+
+useEffect(() => {
+  if (error) {
+      history.push("/login/auto-login-failed")
+  }
+}, [error]);
 
   return (
     <>
@@ -59,3 +69,5 @@ export default function LoginCheck({ children }: LoginCheckProps) {
     </>
   );
 }
+
+export default withRouter(LoginCheck);

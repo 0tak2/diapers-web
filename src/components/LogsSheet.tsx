@@ -13,16 +13,8 @@ import EditIcon from '@material-ui/icons/Edit';
 
 import SheetPagination from './SheetPagination';
 
-import { LogType } from '../api/logs';
+import { LogsBunch, LogType } from '../api/logs';
 import { dateHelper } from '../utils/dateUtil';
-
-interface LogsBunch {
-    cntId: string;
-    logs: LogType[];
-    page: number;
-    size: number;
-    last: boolean;
-}
 
 interface LogsSheetProps {
     bunch: LogsBunch;

@@ -1,8 +1,9 @@
 import React, { useState, useEffect }  from 'react';
 import { RouteComponentProps } from 'react-router-dom';
+
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../modules';
-import { getLogsRequest, postLogRequest } from '../modules/logs';
+import { getLogsRequest, postLogRequest, getLogsForPeriodRequest } from '../modules/logs';
 import { PostLogPayload } from '../api/logs';
 
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -11,6 +12,11 @@ import { makeStyles, Theme } from '@material-ui/core/styles';
 
 import LogsSheet from '../components/LogsSheet';
 import LogPostControl from '../components/LogPostControl';
+import PeriodControl from '../components/PeriodControl';
+
+import { dateHelper, timeNowHelper, timeBeforeAWeekHelper } from '../utils/dateUtil';
+
+import qs from 'qs';
 
 interface MatchParams {
     cntId: string;
@@ -33,12 +39,24 @@ const useStyles = makeStyles((theme: Theme) => ({
     }
   }));
 
-function LogsContainer({ match }: RouteComponentProps<MatchParams>) {
+function LogsContainer({ match, location }: RouteComponentProps<MatchParams>) {
     const { cntId } = match.params;
+
+    const query = qs.parse(location.search, {
+        ignoreQueryPrefix: true
+      });
+    const advanced = query.advanced === 'true';
 
     // local state
     const [ page, setPage ] = useState(0);
     const [ logsPerPage, setLogsPerPage ] = useState(10);
+        // 기간별 조회를 위한 state
+    const initialPeriodState = {
+        start: timeBeforeAWeekHelper(true),
+        end: timeNowHelper(true)
+    }
+    const [ periodState, setPeriodState ] = useState(initialPeriodState);
+        //
 
     const classes = useStyles();
 
@@ -66,12 +84,24 @@ function LogsContainer({ match }: RouteComponentProps<MatchParams>) {
 
     // effect
     useEffect(() => {
-        dispatch(getLogsRequest({ cntId, page: 0, size: logsPerPage }));
+        if (advanced) {
+            dispatch(getLogsForPeriodRequest({ cntId, page: 0, size: logsPerPage, start: periodState.start, end: periodState.end }));
+        } else {
+            dispatch(getLogsRequest({ cntId, page: 0, size: logsPerPage }));
+        }
     }, [cntId])
 
     useEffect(() => {
-        dispatch(getLogsRequest({ cntId, page: page, size: logsPerPage }));
+        if (advanced) {
+            dispatch(getLogsForPeriodRequest({ cntId, page: page, size: logsPerPage, start: periodState.start, end: periodState.end }));
+        } else {
+            dispatch(getLogsRequest({ cntId, page: page, size: logsPerPage }));
+        }
     }, [page, logsPerPage])
+
+    useEffect(() => {
+        dispatch(getLogsForPeriodRequest({ cntId, page: page, size: logsPerPage, start: periodState.start, end: periodState.end }));
+    }, [periodState])
 
     useEffect(() => {
         if (changed) dispatch(getLogsRequest({ cntId, page: page, size: logsPerPage }));
@@ -82,6 +112,16 @@ function LogsContainer({ match }: RouteComponentProps<MatchParams>) {
             if (val < 0) return true;
         })
         return false;
+    }
+
+    // 기간별 조회
+    interface PeriodPayload {
+        start: string;
+        end: string;
+    }
+
+    const onSubmitPeriod = (newPeriod: PeriodPayload) => {
+        setPeriodState(newPeriod);
     }
 
     const onSubmit = (payload: PostLogPayload) => { // LogControl에서 submit 되었을 때
@@ -109,7 +149,8 @@ function LogsContainer({ match }: RouteComponentProps<MatchParams>) {
             : ""}
             {logsBunches ?
                 <>
-                    <LogPostControl bunch={matchedLogsBunch(cntId)} onSubmit={onSubmit} error={error}/>
+                    {advanced ? <PeriodControl currentPeriod={periodState} onSubmitPeriod={onSubmitPeriod}/> :
+                            <LogPostControl bunch={matchedLogsBunch(cntId)} onSubmit={onSubmit} error={error}/>}
                     <LogsSheet
                         bunch={matchedLogsBunch(cntId)}
                         page={page}

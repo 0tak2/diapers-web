@@ -12,6 +12,10 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../modules';
 import { loginRequest } from '../modules/auth';
 
+interface LoginFromProps {
+  autoLoginFailed: boolean;
+}
+
 const useStyles = makeStyles((theme: Theme) => ({
   form: {
     width: '100%', // Fix IE 11 issue.
@@ -40,7 +44,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   }
 }));
 
-export default function LoginForm() {
+export default function LoginForm({ autoLoginFailed }: LoginFromProps) {
   const classes = useStyles();
 
   // A local state
@@ -70,11 +74,18 @@ export default function LoginForm() {
 
   return (
     <>
-      {error ?
-        <MuiAlert severity="error" className={classes.alert}>
-            로그인에 실패했습니다. 아이디와 비밀번호를 다시 한 번 확인해보세요.
+      {
+        autoLoginFailed ?
+        <MuiAlert severity="warning" className={classes.alert}>
+            자동 로그인에 실패했습니다. 세션이 만료되었을 수 있습니다. 계정 정보를 다시 입력해주세요.
         </MuiAlert>
-      : ""}
+        : (
+          error ?
+          <MuiAlert severity="error" className={classes.alert}>
+              로그인에 실패했습니다. 아이디와 비밀번호를 다시 한 번 확인해보세요.
+          </MuiAlert>
+          : "")
+      }
       <form className={classes.form}>
         <TextField
           variant="outlined"

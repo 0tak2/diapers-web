@@ -71,6 +71,11 @@ function* redirectHomeSaga() {
     history.goBack();
 }
 
+function* redirectLoginSaga() {
+    const history: History = yield getContext('history');
+    history.push('/login/auto-login-failed');
+}
+
 function* getUserdataSaga() {
     try {
         const response: LoginResponse = yield call(getUserdataApi);
@@ -87,6 +92,7 @@ export function* authSaga() {
     yield takeEvery(LOGOUT_SUCCESS, logoutSuccessSaga);
     yield takeEvery(REDIRECT_HOME, redirectHomeSaga);
     yield takeEvery(GET_USERDATA_BY_COOKIE_REQUEST, getUserdataSaga);
+    yield takeEvery(GET_USERDATA_BY_COOKIE_FAILED, redirectLoginSaga);
 }
 
 type AuthState = {
@@ -123,7 +129,7 @@ function auth( state: AuthState = initialState, action: AuthAction ): AuthState 
                         return {...state, loading: false, isLogin: true, username: username, userdata: user_data , error: null};
                     }
             }
-            return {...state, loading: false, isLogin: false, error: null};
+            return {...state, loading: false, isLogin: false, error: true};
         case LOGIN_FAILED:
         case GET_USERDATA_BY_COOKIE_FAILED:
             return {...state, loading: false, error: action.payload};

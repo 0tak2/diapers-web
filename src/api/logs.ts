@@ -16,6 +16,14 @@ export interface LogType {
     id:           string;
 }
 
+export interface LogsBunch {
+    cntId: string;
+    logs: LogType[];
+    page: number;
+    size: number;
+    last: boolean;
+}
+
 export interface BaseLogPayload {
     logId: string;
 }

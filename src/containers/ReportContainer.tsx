@@ -3,18 +3,16 @@ import { RouteComponentProps } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../modules';
 import { getAllLogsForPeriodRequest } from '../modules/logs';
+import { getCntRequest } from '../modules/cnts';
 
 import CircularProgress from '@material-ui/core/CircularProgress';
-import Typography from '@material-ui/core/Typography';
-import Paper from '@material-ui/core/Paper';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import MuiAlert from '@material-ui/lab/Alert';
 
-import { Line } from 'react-chartjs-2';
+import PeriodControl from '../components/PeriodControl';
+import ReportView from '../components/ReportView';
 
-import PeriodControl from '../components/PeriodControl'
-import { LogType } from '../api/logs';
-import { dateHelper, timeNowHelper, timeBeforeAWeekHelper } from '../utils/dateUtil'
+import { timeNowHelper, timeBeforeAWeekHelper } from '../utils/dateUtil';
 
 interface MatchParams {
     cntId: string;
@@ -37,17 +35,10 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     subtitle: {
         marginTop: theme.spacing(6),
-    },
-    paper: {
-        marginTop: theme.spacing(2),
-        paddingTop: theme.spacing(1),
-        paddingBottom: theme.spacing(1),
-        paddingLeft: theme.spacing(4),
-        paddingRight: theme.spacing(4)
     }
   }));
 
-function SummaryContainer({ match }: RouteComponentProps<MatchParams>) {
+function ReportContainer({ match }: RouteComponentProps<MatchParams>) {
     const { cntId } = match.params;
 
     // local state
@@ -63,6 +54,7 @@ function SummaryContainer({ match }: RouteComponentProps<MatchParams>) {
     const loading = useSelector((state: RootState) => state.logs.loading);
     const error = useSelector((state: RootState) => state.logs.error);
     const logsBunches = useSelector((state: RootState) => state.logs.logsBunches);
+    const cnt = useSelector((state: RootState) => state.cnts.cnt);
     const dispatch = useDispatch();
 
     const matchedLogsBunch = (cntId: string) => {
@@ -82,59 +74,12 @@ function SummaryContainer({ match }: RouteComponentProps<MatchParams>) {
 
     // effect
     useEffect(() => {
+        if (cntId) dispatch(getCntRequest({ cntId }));
+    }, [cntId])
+
+    useEffect(() => {
         if (cntId) dispatch(getAllLogsForPeriodRequest({ cntId, start: periodState.start, end: periodState.end }));
     }, [cntId, periodState])
-    
-    const makeData = (logs: LogType[]) => {
-        const labels = logs.map((log: LogType) => {
-            return dateHelper(log.time, true);
-        });
-        const outerOpenedDataset = {
-            label: "겉기저귀 (개봉)",
-            data: logs.map((log: LogType) => {
-                return log.outer_opened
-            }),
-            backgroundColor: 'rgb(231, 29, 54)',
-            borderColor: 'rgba(231, 29, 54, 0.2)',
-            fill: false,
-        };
-        const outerNewDataset = {
-            label: "겉기저귀 (미개봉)",
-            data: logs.map((log: LogType) => {
-                return log.outer_new
-            }),
-            backgroundColor: 'rgb(46, 196, 182)',
-            borderColor: 'rgba(46, 196, 182, 0.2)',
-            fill: false,
-        };
-        const innerOpenedDataset = {
-            label: "속기저귀 (개봉)",
-            data: logs.map((log: LogType) => {
-                return log.inner_opened
-            }),
-            backgroundColor: 'rgb(231, 29, 54)',
-            borderColor: 'rgba(231, 29, 54, 0.2)',
-            fill: false,
-        };
-        const innerNewDataset = {
-            label: "속기저귀 (미개봉)",
-            data: logs.map((log: LogType) => {
-                return log.inner_new
-            }),
-            backgroundColor: 'rgb(46, 196, 182)',
-            borderColor: 'rgba(46, 196, 182, 0.2)',
-            fill: false,
-        };
-
-        return [{
-            labels,
-            datasets: new Array(outerOpenedDataset, outerNewDataset)
-        },
-        {
-            labels,
-            datasets: new Array(innerOpenedDataset, innerNewDataset)
-        }];
-    }
 
     interface PeriodPayload {
         start: string;
@@ -160,14 +105,11 @@ function SummaryContainer({ match }: RouteComponentProps<MatchParams>) {
                 </MuiAlert>
                 :
                 <>
-                    <Paper className={classes.paper}>
-                        <Typography className={classes.subtitle} variant="h4" component="h2">겉 기저귀 재고 추이</Typography>
-                        <Line data={makeData(matchedLogsBunch(cntId).logs.reverse())[0]} />
-                    </Paper>
-                    <Paper className={classes.paper}>
-                        <Typography className={classes.subtitle} variant="h4" component="h2">속 기저귀 재고 추이</Typography>
-                        <Line data={makeData(matchedLogsBunch(cntId).logs.reverse())[1]} />
-                    </Paper>
+                    {matchedLogsBunch(cntId) && cnt ?
+                        <ReportView
+                                logs={matchedLogsBunch(cntId).logs.reverse()} 
+                                cnt={cnt} />
+                        : ""}
                 </>
             }
             {loading ? <div className={classes.backdrop}><CircularProgress /></div> : ""}
@@ -176,4 +118,4 @@ function SummaryContainer({ match }: RouteComponentProps<MatchParams>) {
     )
 }
 
-export default SummaryContainer;
+export default ReportContainer;
