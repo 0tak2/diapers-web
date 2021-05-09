@@ -15,7 +15,7 @@ function Footer() {
         <div className={classes.footer}>
             <Typography variant="body2" color="textSecondary" align="center">
                 기저귀 관리 시스템 DIAPERS<br />
-                diapers-web v0.01<br />
+                diapers-web v0.10<br />
                 한벗둥지 사회복무요원 임영택 (2020-2021), 차민우 (2020-2022)
             </Typography>
         </div>

@@ -55,6 +55,10 @@ function DrawerContents(props: any) {
             <List>
                 {
                     links.map((link, index) => (
+                        link.to === "/admin" ?
+                        <ListItem button key={index} component="a" href={link.to} target="_blank">
+                            <ListItemText primary={link.label}  />
+                        </ListItem> :
                         <ListItem button key={index} component={Link} to={link.to}>
                             <ListItemText primary={link.label}  />
                         </ListItem>
