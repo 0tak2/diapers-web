@@ -127,6 +127,20 @@ export async function getAllLogsForPeriodApi(payload: GetAllLogsForPeriodPayload
     return response.data;
 }
 
+export async function getAllLogsForPeriodOneperdayApi(payload: GetAllLogsForPeriodPayload) {
+    const response = await axios.get<GetLogsResponse>(
+        baseUri + `/cnt/${payload.cntId}`,
+        {
+            withCredentials: true,
+            params: {
+                start: payload.start,
+                end:  payload.end,
+                oneperday: true
+            }
+        });
+    return response.data;
+}
+
 export async function getLogApi(payload: BaseLogPayload) {
     const response = await axios.get<GetLogResponse>(
         baseUri + `/${payload.logId}`,

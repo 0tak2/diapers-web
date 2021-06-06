@@ -76,9 +76,16 @@ function LogsContainer({ match, location }: RouteComponentProps<MatchParams>) {
             page: 0,
             last: true
         };
+
         logsBunches.forEach((logsBunch) => {
             if (logsBunch.cntId === cntId) bunch = logsBunch; // 가장 마지막에 불러온 bunch가 반환됨
         })
+        console.log(bunch)
+        
+        if (bunch.cntId === "") {
+            bunch.cntId = cntId // 데이터가 존재하지 않아도, POST가 문제없이 가능하도록 cntId를 포함한 껍데기를 return.
+        }
+
         return bunch;
     }
 

@@ -3,7 +3,7 @@ import { LogType, BaseLogPayload, BaseLogResponse,
                 GetLogResponse, GetLogsPayload, GetLogsForPeriodPayload,
                 GetLogsResponse, PostLogPayload, PatchLogPayload,
                 getLogsApi, getLogsForPeriodApi, getLogApi,
-                postLogApi, delLogApi, patchLogApi,
+                postLogApi, delLogApi, patchLogApi, getAllLogsForPeriodOneperdayApi,
                 GetAllLogsForPeriodPayload, getAllLogsForPeriodApi } from '../api/logs';
 
 const GET_LOGS_REQUEST = 'logs/GET_LOGS_REQUEST' as const;
@@ -17,6 +17,10 @@ const GET_LOGS_FOR_A_PERIOD_FAILED = 'logs/GET_LOGS_FOR_A_PERIOD_FAILED' as cons
 const GET_ALL_LOGS_FOR_A_PERIOD_REQUEST = 'logs/GET_ALL_LOGS_FOR_A_PERIOD_REQUEST' as const;
 const GET_ALL_LOGS_FOR_A_PERIOD_SUCCESS = 'logs/GET_ALL_LOGS_FOR_A_PERIOD_SUCCESS' as const;
 const GET_ALL_LOGS_FOR_A_PERIOD_FAILED = 'logs/GET_ALL_LOGS_FOR_A_PERIOD_FAILED' as const;
+
+const GET_ALL_LOGS_FOR_A_PERIOD_ONEPERDAY_REQUEST = 'logs/GET_ALL_LOGS_FOR_A_PERIOD_ONEPERDAY_REQUEST' as const;
+const GET_ALL_LOGS_FOR_A_PERIOD_ONEPERDAY_SUCCESS = 'logs/GET_ALL_LOGS_FOR_A_PERIOD_ONEPERDAY_SUCCESS' as const;
+const GET_ALL_LOGS_FOR_A_PERIOD_ONEPERDAY_FAILED = 'logs/GET_ALL_LOGS_FOR_A_PERIOD_ONEPERDAY_FAILED' as const;
 
 const GET_LOG_REQUEST = 'logs/GET_LOG_REQUEST' as const;
 const GET_LOG_SUCCESS = 'logs/GET_LOG_SUCCESS' as const;
@@ -46,6 +50,10 @@ export const getAllLogsForPeriodRequest = (payload: GetAllLogsForPeriodPayload) 
 export const getAllLogsForPeriodSuccess = (payload: GetLogsResponse) => ({ type: GET_ALL_LOGS_FOR_A_PERIOD_SUCCESS , payload });
 export const getAllLogsForPeriodFailed = (payload: any) => ({ type: GET_ALL_LOGS_FOR_A_PERIOD_FAILED, payload });
 //
+export const getAllLogsForPeriodOneperdayRequest = (payload: GetAllLogsForPeriodPayload) => ({ type: GET_ALL_LOGS_FOR_A_PERIOD_ONEPERDAY_REQUEST, payload });
+export const getAllLogsForPeriodOneperdaySuccess = (payload: GetLogsResponse) => ({ type: GET_ALL_LOGS_FOR_A_PERIOD_ONEPERDAY_SUCCESS , payload });
+export const getAllLogsForPeriodOneperdayFailed = (payload: any) => ({ type: GET_ALL_LOGS_FOR_A_PERIOD_ONEPERDAY_FAILED, payload });
+//
 export const getLogRequest = (payload: BaseLogPayload) => ({ type: GET_LOG_REQUEST, payload });
 export const getLogSuccess = (payload: GetLogResponse) => ({ type: GET_LOG_SUCCESS , payload });
 export const getLogFailed = (payload: any) => ({ type: GET_LOG_FAILED, payload });
@@ -72,6 +80,9 @@ type LogsAction =
     | ReturnType<typeof getAllLogsForPeriodRequest>
     | ReturnType<typeof getAllLogsForPeriodSuccess>
     | ReturnType<typeof getAllLogsForPeriodFailed>
+    | ReturnType<typeof getAllLogsForPeriodOneperdayRequest>
+    | ReturnType<typeof getAllLogsForPeriodOneperdaySuccess>
+    | ReturnType<typeof getAllLogsForPeriodOneperdayFailed>
     | ReturnType<typeof getLogRequest>
     | ReturnType<typeof getLogSuccess>
     | ReturnType<typeof getLogFailed>
@@ -106,6 +117,15 @@ function* getLogsForPeriodSaga(action: ReturnType<typeof getLogsForPeriodRequest
 function* getAllLogsForPeriodSaga(action: ReturnType<typeof getAllLogsForPeriodRequest>) {
     try {
         const response: GetLogsResponse = yield call(getAllLogsForPeriodApi, action.payload);
+        yield put(getAllLogsForPeriodSuccess(response));
+    } catch (e) {
+        yield put(getAllLogsForPeriodFailed(e));
+    }
+}
+
+function* getAllLogsForPeriodOneperdaySaga(action: ReturnType<typeof getAllLogsForPeriodRequest>) {
+    try {
+        const response: GetLogsResponse = yield call(getAllLogsForPeriodOneperdayApi, action.payload);
         yield put(getAllLogsForPeriodSuccess(response));
     } catch (e) {
         yield put(getAllLogsForPeriodFailed(e));
@@ -151,6 +171,7 @@ function* patchLogSaga(action: ReturnType<typeof patchLogRequest>) {
 export function* logsSaga() {
     yield takeEvery(GET_LOGS_REQUEST, getLogsSaga);
     yield takeEvery(GET_ALL_LOGS_FOR_A_PERIOD_REQUEST, getAllLogsForPeriodSaga);
+    yield takeEvery(GET_ALL_LOGS_FOR_A_PERIOD_ONEPERDAY_REQUEST, getAllLogsForPeriodOneperdaySaga);
     yield takeEvery(GET_LOGS_FOR_A_PERIOD_REQUEST, getLogsForPeriodSaga);
     yield takeEvery(GET_LOG_REQUEST, getLogSaga);
     yield takeEvery(POST_LOG_REQUEST, postLogSaga);
@@ -203,6 +224,7 @@ function logs( state: LogsState = initialState, action: LogsAction ): LogsState 
         case GET_LOGS_REQUEST:
         case GET_LOGS_FOR_A_PERIOD_REQUEST:
         case GET_ALL_LOGS_FOR_A_PERIOD_REQUEST:
+        case GET_ALL_LOGS_FOR_A_PERIOD_ONEPERDAY_REQUEST:
         case GET_LOG_REQUEST:
         case POST_LOG_REQUEST:
         case DEL_LOG_REQUEST:
@@ -210,7 +232,8 @@ function logs( state: LogsState = initialState, action: LogsAction ): LogsState 
             return { ...state, loading: true };
         case GET_LOGS_SUCCESS:
         case GET_LOGS_FOR_A_PERIOD_SUCCESS:
-        case GET_ALL_LOGS_FOR_A_PERIOD_SUCCESS: {
+        case GET_ALL_LOGS_FOR_A_PERIOD_SUCCESS:
+        case GET_ALL_LOGS_FOR_A_PERIOD_ONEPERDAY_SUCCESS: {
             const { result, last, page, size } =  action.payload;
             if (result.length === 0) {
                 return { ...state, loading: false, error: 'Warning: No results' }
@@ -220,7 +243,7 @@ function logs( state: LogsState = initialState, action: LogsAction ): LogsState 
                 ...state, loading: false, error: null, changed: false,
                 logsBunches: [
                     ...state.logsBunches,
-                    { logs: result, cntId,  last, page, size }
+                    { logs: result, cntId, last, page, size }
                 ], 
             };
         }
@@ -232,6 +255,7 @@ function logs( state: LogsState = initialState, action: LogsAction ): LogsState 
             return { ...state, loading: false, log: emptyLog, changed: true };
         case GET_LOGS_FAILED:
         case GET_ALL_LOGS_FOR_A_PERIOD_FAILED:
+        case GET_ALL_LOGS_FOR_A_PERIOD_ONEPERDAY_FAILED:
         case GET_LOGS_FOR_A_PERIOD_FAILED:
         case GET_LOG_FAILED:
         case POST_LOG_FAILED:

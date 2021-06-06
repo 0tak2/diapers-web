@@ -171,7 +171,6 @@ function LogPostControl({ bunch, onSubmit, error }: LogPostControlProps) {
                 name="outer_opened"
                 value={logState.outer_opened}
                 onChange={onChange}
-                autoFocus
               />
             </Grid>
             <Grid item xs={1}>
