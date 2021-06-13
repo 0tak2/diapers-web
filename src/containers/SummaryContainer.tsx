@@ -162,11 +162,11 @@ function SummaryContainer({ match }: RouteComponentProps<MatchParams>) {
                 <>
                     <Paper className={classes.paper}>
                         <Typography className={classes.subtitle} variant="h4" component="h2">겉 기저귀 재고 추이</Typography>
-                        <Line data={makeData(matchedLogsBunch(cntId).logs)[0]} />
+                        <Line data={makeData([...matchedLogsBunch(cntId).logs].reverse())[0]} />
                     </Paper>
                     <Paper className={classes.paper}>
                         <Typography className={classes.subtitle} variant="h4" component="h2">속 기저귀 재고 추이</Typography>
-                        <Line data={makeData(matchedLogsBunch(cntId).logs)[1]} />
+                        <Line data={makeData([...matchedLogsBunch(cntId).logs].reverse())[1]} />
                     </Paper>
                 </>
             }
