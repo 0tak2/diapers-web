@@ -62,7 +62,7 @@ function CntDetail({ cntId, name, birth, description, inner_product, outer_produ
         </Typography> : ""}
       </CardContent>
       <CardActions>
-      <Button size="medium" component={RouterLink} to={`/log/${cntId}`}>이용자 정보 편집</Button>
+      <Button size="medium" href="/admin/cnt/edit">이용자 정보 편집</Button>
       </CardActions>
     </Card>
   );
