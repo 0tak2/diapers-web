@@ -72,6 +72,12 @@ export default function LoginForm({ autoLoginFailed }: LoginFromProps) {
     dispatch(loginRequest(accountState));
   }
 
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter') {
+      onClick();
+    }
+  }
+
   return (
     <>
       {
@@ -110,6 +116,7 @@ export default function LoginForm({ autoLoginFailed }: LoginFromProps) {
           id="password"
           autoComplete="current-password"
           onChange={onChange}
+          onKeyPress={handleKeyPress}
         />
         <Button
           fullWidth

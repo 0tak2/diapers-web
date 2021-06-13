@@ -2,7 +2,7 @@ import React, { useState, useEffect }  from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../modules';
-import { getAllLogsForPeriodRequest } from '../modules/logs';
+import { getAllLogsForPeriodOneperdayRequest } from '../modules/logs';
 
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Typography from '@material-ui/core/Typography';
@@ -82,7 +82,7 @@ function SummaryContainer({ match }: RouteComponentProps<MatchParams>) {
 
     // effect
     useEffect(() => {
-        if (cntId) dispatch(getAllLogsForPeriodRequest({ cntId, start: periodState.start, end: periodState.end }));
+        if (cntId) dispatch(getAllLogsForPeriodOneperdayRequest({ cntId, start: periodState.start, end: periodState.end }));
     }, [cntId, periodState])
     
     const makeData = (logs: LogType[]) => {
@@ -162,11 +162,11 @@ function SummaryContainer({ match }: RouteComponentProps<MatchParams>) {
                 <>
                     <Paper className={classes.paper}>
                         <Typography className={classes.subtitle} variant="h4" component="h2">겉 기저귀 재고 추이</Typography>
-                        <Line data={makeData(matchedLogsBunch(cntId).logs.reverse())[0]} />
+                        <Line data={makeData(matchedLogsBunch(cntId).logs)[0]} />
                     </Paper>
                     <Paper className={classes.paper}>
                         <Typography className={classes.subtitle} variant="h4" component="h2">속 기저귀 재고 추이</Typography>
-                        <Line data={makeData(matchedLogsBunch(cntId).logs.reverse())[1]} />
+                        <Line data={makeData(matchedLogsBunch(cntId).logs)[1]} />
                     </Paper>
                 </>
             }

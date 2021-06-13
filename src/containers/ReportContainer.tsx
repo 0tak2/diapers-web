@@ -107,7 +107,7 @@ function ReportContainer({ match }: RouteComponentProps<MatchParams>) {
                 <>
                     {matchedLogsBunch(cntId) && cnt ?
                         <ReportView
-                                logs={matchedLogsBunch(cntId).logs.reverse()} 
+                                logs={[...matchedLogsBunch(cntId).logs].reverse()} 
                                 cnt={cnt} />
                         : ""}
                 </>
